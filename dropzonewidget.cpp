@@ -49,7 +49,6 @@ void DropZoneWidget::paintEvent(QPaintEvent* /*event*/)
     QPainter painter(this);
 
     painter.setRenderHint(QPainter::Antialiasing, true);
-    //painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
 
     QRect contentRect = this->rect();
 
@@ -75,6 +74,7 @@ void DropZoneWidget::paintEvent(QPaintEvent* /*event*/)
         pen.setCapStyle(Qt::RoundCap);
         pen.setJoinStyle(Qt::RoundJoin);
 
+        // 点線枠を描画
         painter.setPen(pen);
         painter.drawRoundRect(contentRect, roundSize, roundSize);
 
@@ -83,6 +83,7 @@ void DropZoneWidget::paintEvent(QPaintEvent* /*event*/)
         font.setBold(true);
         painter.setFont(font);
 
+        // 中の文字を描画
         QRect rectangle = contentRect;
               rectangle -= QMargins(lineWidth, lineWidth, lineWidth, lineWidth);
         QRect boundingRect;
@@ -100,19 +101,11 @@ void DropZoneWidget::paintEvent(QPaintEvent* /*event*/)
 
         QSize badgeSize = QSize(30, 30);
         QRect rectangle = contentRect;
-        //           rectangle.setRect(contentRect.center().x() - iconSize.width() / 2,
-        //                             contentRect.center().y() - iconSize.height() / 2,
-        //                             iconSize.width(), iconSize.height());
-                   rectangle.setRect(contentRect.center().x() - badgeSize.width() / 2,
-                                     contentRect.center().y() - badgeSize.height() / 2,
-                                     badgeSize.width(), badgeSize.height());
-//                   rectangle.moveCenter(QPoint(contentRect.center().x() - iconSize.width() / 2 + iconSize.width(),
-//                                               contentRect.center().y() - iconSize.height() / 2));
-                   rectangle.moveCenter(QPoint(contentRect.center().x() - iconSize.width() / 2 + iconSize.width(),
-                                               contentRect.center().y() - iconSize.height() / 2 + badgeSize.height() / 2));
-              //rectangle.setLeft(rectangle.right() - 40);
-              //rectangle.setBottom(rectangle.top() + 40);
-//              rectangle -= QMargins(lineWidth, lineWidth, lineWidth, lineWidth);
+              rectangle.setRect(contentRect.center().x() - badgeSize.width() / 2,
+                                contentRect.center().y() - badgeSize.height() / 2,
+                                badgeSize.width(), badgeSize.height());
+              rectangle.moveCenter(QPoint(contentRect.center().x() - iconSize.width() / 2 + iconSize.width(),
+                                          contentRect.center().y() - iconSize.height() / 2 + badgeSize.height() / 2));
 
         QPen pen;
         pen.setStyle(Qt::SolidLine);
@@ -124,6 +117,7 @@ void DropZoneWidget::paintEvent(QPaintEvent* /*event*/)
         brush.setStyle(Qt::SolidPattern);
         brush.setColor(Qt::red);
 
+        // 背景を描画
         painter.setPen(pen);
         painter.setBrush(brush);
         painter.drawRoundedRect(rectangle, badgeSize.width()/4, badgeSize.width()/4);
@@ -134,13 +128,13 @@ void DropZoneWidget::paintEvent(QPaintEvent* /*event*/)
         rectangle -= QMargins(2, 2, 2, 2);
         int fontSize = AdjustFontSize(&font, badgeText, rectangle, 10, 60);
         font.setPixelSize(fontSize);
-        //font.setBold(true);
         painter.setFont(font);
 
         pen.setWidth(1);
         pen.setBrush(Qt::white);
         painter.setPen(pen);
 
+        // ドロップ済みのファイル数を描画
         QRect boundingRect;
         painter.drawText(rectangle, Qt::AlignCenter | Qt::TextWordWrap, badgeText, &boundingRect);
 

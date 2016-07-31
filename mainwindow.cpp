@@ -14,17 +14,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //ui->listView->setAcceptDrops(true);
-    //ui->listView->setDragEnabled(true);
-    //ui->listView->setDragDropMode(QAbstractItemView::InternalMove);
     this->setAcceptDrops(true);
 
     this->addToolBar(Qt::BottomToolBarArea, ui->toolBar);
-
-//    ui->toolBar->setStyleSheet(QString::fromUtf8 ("background-color:transparent;"));
-//    ui->toolBar->setWindowOpacity(0.0);
-//    ui->toolBar->setBackgroundRole(QPalette::Window);
-//    ui->toolBar->setAttribute(Qt::WA_NoBackground);
 
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -78,30 +70,28 @@ void MainWindow::dropEvent(QDropEvent* event)
 {
     const QMimeData* mimeData = event->mimeData();
 
-     // check for our needed mime type, here a file or a list of files
-     if (mimeData->hasUrls())
-     {
-       QList<QUrl> urlList = mimeData->urls();
+    // ファイルパスを含んでいるか？
+    if (mimeData->hasUrls())
+    {
+        QList<QUrl> urlList = mimeData->urls();
 
-       // extract the local paths of the files
-       for (int i = 0; i < urlList.size(); ++i)
-       {
-           const QUrl& url = urlList.at(i);
-           if (!url.toLocalFile().isEmpty() &&
-               !m_pathList.contains(url))
-           {
-               m_pathList.append(url);
-           }
-       }
+        // ドロップ済みのファイル一覧へ追加
+        for (int i = 0; i < urlList.size(); ++i)
+        {
+            const QUrl& url = urlList.at(i);
+            if (!url.toLocalFile().isEmpty() &&
+                !m_pathList.contains(url))
+            {
+                m_pathList.append(url);
+            }
+        }
 
-       // call a function to open the files
-       qDebug() << m_pathList;
-       //openFiles(pathList);
+        qDebug() << m_pathList;
 
-       event->acceptProposedAction();
+        event->acceptProposedAction();
 
-       ui->dropZone->setDropMode(m_pathList.isEmpty(), m_pathList.size());
-     }
+        ui->dropZone->setDropMode(m_pathList.isEmpty(), m_pathList.size());
+    }
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -112,6 +102,9 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
     {
         QDrag *drag = new QDrag(this);
         QMimeData *mimeData = new QMimeData;
+
+        // ドラッグ時に表示するアイコンを作成
+        // ※ できれば look&feel を合わせるために OS 別に処理を実装したい
 
         QPixmap *img = new QPixmap(256, 256);
         img->fill(Qt::transparent);
@@ -125,8 +118,6 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         icon.paint(&painter, QRect(0,0,32,32), Qt::AlignCenter);
 
         QFont font = painter.font();
-        //font.setPixelSize(fontSize);
-        //painter.setFont(font);
 
         QPen pen;
         pen.setWidth(1);
@@ -157,36 +148,18 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         painter.drawRoundedRect(boundingRect, boundingRect.height()/2, boundingRect.height()/2);
 
         boundingRect -= QMargins(5, 0, 5, 0);
-        //boundingRect.moveTo(boundingRect.left() + 5, boundingRect.top());
 
         pen.setBrush(highlightTextColor);
         painter.setPen(pen);
         painter.drawText(boundingRect, Qt::AlignLeft | Qt::AlignVCenter, fname, &boundingRect);
 
- //       p.setOpacity(0.2);
- //       //p.drawPixmap(0, 0, input);
- //       QPen pen;
- //       pen.setStyle(Qt::DashLine);
- //       pen.setWidth(5);
- //       pen.setBrush(Qt::gray);
- //       pen.setCapStyle(Qt::RoundCap);
- //       pen.setJoinStyle(Qt::RoundJoin);
- //
- //       p.setPen(pen);
- //       p.drawRoundRect(QRect(0, 0, 100, 100), 10, 10);
-
         painter.end();
 
-        //mimeData->setText("aaaa");//commentEdit->toPlainText());
-        mimeData->setText("aaaa");
+        //mimeData->setText("aaaa");
         mimeData->setUrls(m_pathList);
         drag->setMimeData(mimeData);
         drag->setPixmap(*img);
        drag->setDragCursor(*img, Qt::MoveAction);
-
-        //drag->set
-        //drag->setPixmap(iconPixmap);
-//        drag->set
 
         Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction);
 
@@ -195,13 +168,13 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 }
 
 void MainWindow::clearFileList()
-{
+{ // ドロップ済みのファイル一覧をクリア
     m_pathList.clear();
     ui->dropZone->setDropMode(true, m_pathList.size());
 }
 
 void MainWindow::toggleTopMost()
-{
+{ // 最前面の解除＆復帰
     bool isTopMost = 0 != (this->windowFlags() & Qt::WindowStaysOnTopHint);
     isTopMost = !isTopMost;
 
